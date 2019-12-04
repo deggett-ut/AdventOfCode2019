@@ -29,22 +29,28 @@ defmodule Day2 do
 
   """
   def process_intcode(input, chunk_index \\ 0) do
-    Stream.chunk_every(input, 4)
-    |> Enum.at(chunk_index)
+    get_next_chunk(input, chunk_index)
     |> execute_chunk(input, chunk_index)
   end
 
+  defp get_next_chunk(input, chunk_index) do
+    Stream.chunk_every(input, 4)
+    |> Enum.at(chunk_index)
+  end
+
   defp execute_chunk([99 | _], input, _) do
+    # the base case -- becomes the return value for process_intcode()
     input
   end
 
-  defp execute_chunk([action, index1, index2, result_index], input, chunk_index) do
-    value1 = Enum.at(input, index1)
-    value2 = Enum.at(input, index2)
-    result = do_action(action, value1, value2)
+  defp execute_chunk([op, noun, verb, result_index], input, chunk_index) do
+    value1 = Enum.at(input, noun)
+    value2 = Enum.at(input, verb)
+    result = do_action(op, value1, value2)
 
     input
     |> List.replace_at(result_index, result)
+    # loop back to entry point with changed list
     |> process_intcode(chunk_index + 1)
   end
 
@@ -59,7 +65,6 @@ defmodule Day2 do
   def get_intcode_list_from_file(file) do
     file
     |> File.read!()
-    |> String.trim()
     |> String.split(~r/,/, trim: true)
     |> Enum.map(&String.to_integer/1)
   end
@@ -75,11 +80,11 @@ defmodule Day2 do
   def find_noun_and_verb_for_solution(filename, solution) do
     input = get_intcode_list_from_file(filename)
 
-    for x <- 0..99, y <- 0..99 do
+    for n <- 0..99, v <- 0..99 do
       %{
-        noun: x,
-        verb: y,
-        result: process_intcode_list(input, x, y)
+        noun: n,
+        verb: v,
+        result: process_intcode_list(input, n, v)
       }
     end
     |> Enum.find(fn x -> x.result == solution end)
