@@ -57,8 +57,13 @@ defmodule Day2.Part1 do
     |> String.trim()
     |> String.split(~r/,/, trim: true)
     |> Enum.map(&String.to_integer/1)
-    |> List.replace_at(1, 12)
-    |> List.replace_at(2, 2)
+    |> process_list(12, 2)
+  end
+
+  def process_list(input, noun, verb) do
+    input
+    |> List.replace_at(1, noun)
+    |> List.replace_at(2, verb)
     |> Day2.Part1.process_intcode()
     |> List.first()
   end
