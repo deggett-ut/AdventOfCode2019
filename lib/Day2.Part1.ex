@@ -53,7 +53,7 @@ defmodule Day2 do
 
   def process_file(file) do
     get_intcode_list_from_file(file)
-    |> process_list(12, 2)
+    |> process_intcode_list(12, 2)
   end
 
   def get_intcode_list_from_file(file) do
@@ -64,11 +64,24 @@ defmodule Day2 do
     |> Enum.map(&String.to_integer/1)
   end
 
-  def process_list(input, noun, verb) do
+  def process_intcode_list(input, noun, verb) do
     input
     |> List.replace_at(1, noun)
     |> List.replace_at(2, verb)
     |> Day2.process_intcode()
     |> List.first()
+  end
+
+  def find_noun_and_verb_for_solution(filename, solution) do
+    input = get_intcode_list_from_file(filename)
+
+    for x <- 0..99, y <- 0..99 do
+      %{
+        noun: x,
+        verb: y,
+        result: process_intcode_list(input, x, y)
+      }
+    end
+    |> Enum.find(fn x -> x.result == solution end)
   end
 end
