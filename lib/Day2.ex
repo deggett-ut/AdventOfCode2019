@@ -77,16 +77,106 @@ defmodule Day2 do
     |> List.first()
   end
 
-  def find_noun_and_verb_for_solution(filename, solution) do
+  @doc """
+  This is the entry point for the second part of Day2. Instead of
+  having a hard-codeding both filename and the number provided in the
+  problem description, I'm accepting them as parameters -- along
+  with an atom that specifies if I want to brute-force my way
+  to the noun and verb or if I want to try my 'optimized' solution
+  """
+  def find_noun_and_verb_for_solution(filename, solution, approach \\ :optimized)
+
+  def find_noun_and_verb_for_solution(filename, solution, :optimized) do
+    get_intcode_list_from_file(filename)
+    |> binary_search_solution(0..99, 0..99, solution)
+  end
+
+  def find_noun_and_verb_for_solution(filename, solution, :brute_force) do
     input = get_intcode_list_from_file(filename)
 
-    for n <- 0..99, v <- 0..99 do
-      %{
-        noun: n,
-        verb: v,
-        result: process_intcode_list(input, n, v)
-      }
+    for n <- 0..99, v <- 0..99, process_intcode_list(input, n, v) == solution do
+      %{noun: n, verb: v}
     end
-    |> Enum.find(fn x -> x.result == solution end)
+    |> List.first()
+  end
+
+  defp midpoint(%Range{} = r) do
+    (r.first + r.last) |> div(2)
+  end
+
+  def binary_search_solution(
+        input,
+        %Range{first: first, last: last},
+        %Range{} = r2,
+        solution
+      )
+      when last - first <= 1 do
+    case binary_search_solution(input, first, r2, solution) do
+      :lt ->
+        :lt
+
+      :gt ->
+        binary_search_solution(input, last, r2, solution)
+
+      %{} = result ->
+        result
+    end
+  end
+
+  def binary_search_solution(input, %Range{} = r1, %Range{} = r2, solution) do
+    mp = midpoint(r1)
+
+    case binary_search_solution(input, mp, r2, solution) do
+      :lt ->
+        binary_search_solution(input, %Range{first: mp, last: r1.last}, r2, solution)
+
+      :gt ->
+        binary_search_solution(input, %Range{first: r1.first, last: mp}, r2, solution)
+
+      %{} = result ->
+        result
+    end
+  end
+
+  def binary_search_solution(input, noun, %Range{first: first, last: last}, solution)
+      when is_integer(noun) and last - first <= 1 do
+    case binary_search_solution(input, noun, first, solution) do
+      :lt ->
+        binary_search_solution(input, noun, last, solution)
+
+      :gt ->
+        :gt
+
+      %{} = result ->
+        result
+    end
+  end
+
+  def binary_search_solution(input, noun, %Range{} = r2, solution) do
+    mp = midpoint(r2)
+
+    case binary_search_solution(input, noun, mp, solution) do
+      :lt ->
+        binary_search_solution(input, noun, %Range{first: mp, last: r2.last}, solution)
+
+      :gt ->
+        binary_search_solution(input, noun, %Range{first: r2.first, last: mp}, solution)
+
+      %{} = result ->
+        result
+    end
+  end
+
+  def binary_search_solution(input, noun, verb, solution) do
+    case process_intcode_list(input, noun, verb) do
+      x when x < solution ->
+        :lt
+
+      x when x > solution ->
+        :gt
+
+      x when x == solution ->
+        %{noun: noun, verb: verb}
+    end
   end
 end
