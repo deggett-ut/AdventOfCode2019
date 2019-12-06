@@ -1,11 +1,11 @@
-defmodule Day3.WireGen do
+defmodule Day3.WireCreator do
   @doc """
   turns a list of strings representing wires
   into a list of lists of wire segments for
   use later in the main program.
 
   Examples#
-    iex> Day3.WireGen.turn_text_lines_into_wires(["U2,L2", "R2,D2"])
+    iex> Day3.WireCreator.turn_text_lines_into_wires(["U2,L2", "R2,D2"])
     [[{:up, 2}, {:left, 2}], [{:right, 2}, {:down, 2}]]
   """
   @spec turn_text_lines_into_wires(text_lines :: list(String.t())) :: list(list({atom, integer}))
@@ -21,10 +21,10 @@ defmodule Day3.WireGen do
   puzzle.
 
   Examples#
-    iex> Day3.WireGen.extract_wire("D32,R10")
+    iex> Day3.WireCreator.extract_wire("D32,R10")
     [{:down, 32}, {:right, 10}]
 
-    iex> Day3.WireGen.extract_wire("U4,L1042")
+    iex> Day3.WireCreator.extract_wire("U4,L1042")
     [{:up, 4}, {:left, 1042}]
   """
   @spec extract_wire(wire_description :: String.t()) :: list({atom(), integer()})
@@ -48,16 +48,16 @@ defmodule Day3.WireGen do
   for the units moved.
 
   Examples#
-    iex> Day3.WireGen.convert_wire_description_segment("U32")
+    iex> Day3.WireCreator.convert_wire_description_segment("U32")
     {:up, 32}
 
-    iex> Day3.WireGen.convert_wire_description_segment("D45")
+    iex> Day3.WireCreator.convert_wire_description_segment("D45")
     {:down, 45}
 
-    iex> Day3.WireGen.convert_wire_description_segment("R2")
+    iex> Day3.WireCreator.convert_wire_description_segment("R2")
     {:right, 2}
 
-    iex> Day3.WireGen.convert_wire_description_segment("L765")
+    iex> Day3.WireCreator.convert_wire_description_segment("L765")
     {:left, 765}
   """
   @spec convert_wire_description_segment(segment_description :: String.t()) :: {atom(), integer()}

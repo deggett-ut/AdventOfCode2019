@@ -1,23 +1,15 @@
 defmodule Day3 do
-  alias Day3.WireGen
-  alias Day3.GridGen
+  alias Day3.WireCreator
+  alias Day3.Grid
 
   @input_file Path.join("test", "Day3-input.txt")
 
   def process_input_file(file_name \\ @input_file) do
-    wires =
-      file_name
-      |> break_file_into_lines()
-      |> WireGen.turn_text_lines_into_wires()
-
-    %{horizontal: h_range, vertical: v_range} =
-      wires
-      |> GridGen.get_grid_extents_from_wires()
-      |> GridGen.convert_extents_into_grid_map()
-
-    for x <- h_range, y <- v_range, into: %{} do
-      %{x: x, y: y}
-    end
+    file_name
+    |> break_file_into_lines()
+    |> WireCreator.turn_text_lines_into_wires()
+    |> Grid.place_wires_on_grid()
+    |> Grid.find_closest_intersection_point()
   end
 
   def break_file_into_lines(file_name) do
