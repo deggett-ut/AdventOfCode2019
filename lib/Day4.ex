@@ -14,10 +14,10 @@ defmodule Day4 do
     right_length?(attempt_as_list) &&
       adjacent_digits_repeat?(attempt_as_list) &&
       same_number_when_sorted?(attempt, attempt_as_list) &&
-      one_duplicated_number?(attempt_as_list)
+      one_duplicated_digit?(attempt_as_list)
   end
 
-  def one_duplicated_number?(attempt_as_list) do
+  def one_duplicated_digit?(attempt_as_list) do
     Enum.reduce(attempt_as_list, %{}, fn x, acc ->
       Map.update(acc, x, 1, &(&1 + 1))
       |> Enum.any?(fn {_digit, digit_count} ->
