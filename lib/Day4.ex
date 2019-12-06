@@ -12,7 +12,7 @@ defmodule Day4 do
     attempt_as_list = pre_process_attempt_to_sorted_list(attempt)
 
     right_length?(attempt_as_list) &&
-      adjacent_digits_duplicated?(attempt_as_list) &&
+      adjacent_digits_repeat?(attempt_as_list) &&
       same_number_when_sorted?(attempt, attempt_as_list) &&
       one_duplicated_number?(attempt_as_list)
   end
@@ -34,7 +34,7 @@ defmodule Day4 do
     Enum.count(attempt_as_list) == 6
   end
 
-  def adjacent_digits_duplicated?(attempt_as_list) do
+  def adjacent_digits_repeat?(attempt_as_list) do
     Enum.count(attempt_as_list) >
       remove_duplicates(attempt_as_list)
       |> Enum.count()
