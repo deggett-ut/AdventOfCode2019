@@ -20,9 +20,9 @@ defmodule Day4 do
   def one_duplicated_digit?(attempt_as_list) do
     Enum.reduce(attempt_as_list, %{}, fn x, acc ->
       Map.update(acc, x, 1, &(&1 + 1))
-      |> Enum.any?(fn {_digit, digit_count} ->
-        digit_count == 2
-      end)
+    end)
+    |> Enum.any?(fn {_digit, digit_count} ->
+      digit_count == 2
     end)
   end
 
