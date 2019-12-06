@@ -6,4 +6,5 @@ defmodule AdventTest do
   doctest Day3
   doctest Day3.WireCreator
   doctest Day3.Grid
+  doctest Day4
 end
