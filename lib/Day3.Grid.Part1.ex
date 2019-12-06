@@ -1,4 +1,4 @@
-defmodule Day3.Grid do
+defmodule Day3.Grid.Part1 do
   @spec place_wires_on_grid([[{atom, integer}]]) :: map
   def place_wires_on_grid(wires) do
     Enum.reduce(
@@ -95,7 +95,7 @@ defmodule Day3.Grid do
     finds the locations on the grid
     populated by multiple wires
   """
-  defp find_intersection_points(grid) do
+  def find_intersection_points(grid) do
     grid
     |> Enum.filter(fn
       {_, {true, true}} -> true
