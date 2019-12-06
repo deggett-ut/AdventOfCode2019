@@ -11,12 +11,26 @@ defmodule Day4 do
   def valid_password?(attempt) do
     attempt_as_list = pre_process_attempt_to_sorted_list(attempt)
 
-    six_digits?(attempt_as_list) &&
+    right_length?(attempt_as_list) &&
       adjacent_digits_duplicated?(attempt_as_list) &&
-      sorted_number(attempt_as_list) == attempt
+      same_number_when_sorted?(attempt, attempt_as_list) &&
+      one_duplicated_number?(attempt_as_list)
   end
 
-  def six_digits?(attempt_as_list) do
+  def one_duplicated_number?(attempt_as_list) do
+    Enum.reduce(attempt_as_list, %{}, fn x, acc ->
+      Map.update(acc, x, 1, &(&1 + 1))
+      |> Enum.any?(fn {_digit, digit_count} ->
+        digit_count == 2
+      end)
+    end)
+  end
+
+  def same_number_when_sorted?(attempt, attempt_as_list) do
+    sorted_list_as_number(attempt_as_list) == attempt
+  end
+
+  def right_length?(attempt_as_list) do
     Enum.count(attempt_as_list) == 6
   end
 
@@ -36,7 +50,7 @@ defmodule Day4 do
     |> Integer.digits()
   end
 
-  def sorted_number(attempt_as_list) do
+  def sorted_list_as_number(attempt_as_list) do
     attempt_as_list
     |> Enum.sort()
     |> Integer.undigits()
