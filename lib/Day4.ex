@@ -9,7 +9,7 @@ defmodule Day4 do
   end
 
   def valid_password?(attempt) do
-    attempt_as_list = pre_process_attempt_to_sorted_list(attempt)
+    attempt_as_list = pre_process_attempt_to_digit_list(attempt)
 
     right_length?(attempt_as_list) &&
       adjacent_digits_repeat?(attempt_as_list) &&
@@ -45,7 +45,7 @@ defmodule Day4 do
     |> Enum.uniq()
   end
 
-  def pre_process_attempt_to_sorted_list(attempt) do
+  def pre_process_attempt_to_digit_list(attempt) do
     attempt
     |> Integer.digits()
   end
