@@ -1,6 +1,6 @@
 defmodule Day3 do
   alias Day3.WireCreator
-  alias Day3.Grid.Part2, as: Grid
+  alias Day3.Grid, as: Grid
 
   @input_file Path.join("test", "Day3-input.txt")
 

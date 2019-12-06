@@ -1,9 +1,9 @@
-defmodule Day3.Grid.Part1 do
+defmodule Day3.Grid do
   @spec place_wires_on_grid([[{atom, integer}]]) :: map
   def place_wires_on_grid(wires) do
-    Enum.reduce(
-      # tuple of wire segments with their respective index
-      Enum.with_index(wires),
+    # tuple of wire segments with their respective index
+    Enum.with_index(wires)
+    |> Enum.reduce(
       # our base-accumulator: a tuple with position and the
       # grid (map) we're going to populate
       %{},
@@ -21,14 +21,16 @@ defmodule Day3.Grid.Part1 do
     the current wire.
   """
   def apply_wire_to_grid(segment_list, grid, wire_index) do
-    {_end_Position, pop_grid} =
+    {_end_Position, pop_grid, _} =
       Enum.reduce(
         segment_list,
-        # starting position (the origin) and the grid
+        # starting position (the origin),
+        # the grid, and the number of steps
+        # the wire uses to get to the grid point
         # we're populating are the accumulators
-        {{0, 0}, grid},
-        fn {direction, length}, {pos, inner_grid} ->
-          apply_wire_segment_to_grid(inner_grid, pos, direction, length, wire_index)
+        {{0, 0}, grid, 1},
+        fn {direction, length}, {pos, inner_grid, steps_taken} ->
+          apply_wire_segment_to_grid(inner_grid, pos, direction, length, wire_index, steps_taken)
         end
       )
 
@@ -42,30 +44,30 @@ defmodule Day3.Grid.Part1 do
     returns a tuple with the last position of the wire and
     the updated grid with the wire path for this segment marked
   """
-  @spec apply_wire_segment_to_grid(map, {integer, integer}, atom, non_neg_integer, any) ::
-          {{integer, integer}, map}
-  def apply_wire_segment_to_grid(%{} = grid, pos, _, 0, _), do: {pos, grid}
+  def apply_wire_segment_to_grid(%{} = grid, pos, _, 0, _, steps_taken),
+    do: {pos, grid, steps_taken}
 
-  def apply_wire_segment_to_grid(grid, pos, dir, length, wire_index) do
+  def apply_wire_segment_to_grid(grid, pos, dir, length, wire_index, steps_taken) do
     new_pos = get_new_position(pos, dir)
 
     apply_wire_segment_to_grid(
       Map.update(
         grid,
         new_pos,
-        update_tuple({false, false}, wire_index),
-        &update_tuple(&1, wire_index)
+        update_tuple({0, 0}, wire_index, steps_taken),
+        &update_tuple(&1, wire_index, steps_taken)
       ),
       new_pos,
       dir,
       length - 1,
-      wire_index
+      wire_index,
+      steps_taken + 1
     )
   end
 
-  @spec update_tuple({boolean, boolean}, non_neg_integer) :: {boolean, boolean}
-  def update_tuple({_, _} = v, wire_index),
-    do: put_elem(v, wire_index, true)
+  def update_tuple({_, _} = v, wire_index, steps_taken) do
+    put_elem(v, wire_index, steps_taken)
+  end
 
   @spec get_new_position({integer, integer}, :down | :left | :right | :up) :: {integer, integer}
   def get_new_position({x, y}, :up), do: {x, y + 1}
@@ -74,11 +76,27 @@ defmodule Day3.Grid.Part1 do
   def get_new_position({x, y}, :right), do: {x + 1, y}
 
   @doc """
+  Finds the closest intersection point to the
+  origin based on calculating the manattan-distance
   """
   def find_closest_intersection_point(grid) do
     find_intersection_points(grid)
+    |> Enum.map(fn {k, _v} -> k end)
     |> Enum.sort(&manhattan_compare/2)
     |> List.first()
+  end
+
+  @doc """
+  Finds the closest intersection point to the
+  origin based on calculating the manattan-distance
+  """
+  def find_intersection_point_by_steps_taken(grid) do
+    {_k, {steps1, steps2}} =
+      find_intersection_points(grid)
+      |> Enum.sort(&step_compare/2)
+      |> List.first()
+
+    steps1 + steps2
   end
 
   @spec manhattan_distance({number, number}) :: number
@@ -87,6 +105,10 @@ defmodule Day3.Grid.Part1 do
   @spec manhattan_compare({number, number}, {number, number}) :: boolean
   defp manhattan_compare(v1, v2) do
     manhattan_distance(v1) < manhattan_distance(v2)
+  end
+
+  defp step_compare({_k1, {wire1_steps1, wire2_steps1}}, {_k2, {wire1_steps2, wire2_steps2}}) do
+    wire1_steps1 + wire2_steps1 < wire1_steps2 + wire2_steps2
   end
 
   @doc """
@@ -98,9 +120,12 @@ defmodule Day3.Grid.Part1 do
   def find_intersection_points(grid) do
     grid
     |> Enum.filter(fn
-      {_, {true, true}} -> true
-      _ -> false
+      {_, {wire_0_steps, wire_1_steps}}
+      when wire_0_steps > 0 and wire_1_steps > 0 ->
+        true
+
+      _ ->
+        false
     end)
-    |> Enum.map(fn {k, _v} -> k end)
   end
 end
