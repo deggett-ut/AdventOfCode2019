@@ -83,7 +83,6 @@ defmodule Day5 do
 
     input
     |> List.replace_at(result_index, result)
-    # loop back to entry point with changed list
     |> process_intcode(chunk_index + 4)
   end
 
