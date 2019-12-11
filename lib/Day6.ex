@@ -2,6 +2,12 @@ defmodule Day6 do
   @input_file Path.join("test", "Day6-input.txt")
   # @input_file Path.join("test", "Day6-test-input.txt")
 
+  @doc """
+  convert the data file into a map with the format:
+  %{ A => [B, C], C => [D] }
+  In other words, this map has A as a center point with
+  B and C orbiting it, and C, in turn, also has D orbiting it
+  """
   def build_orbit_map_from_file(file_name \\ @input_file) do
     File.stream!(file_name)
     |> Stream.map(&String.trim/1)
@@ -27,6 +33,10 @@ defmodule Day6 do
     |> Enum.sum()
   end
 
+  @doc """
+  Recursive function that builds a path from the specified item
+  back to it's origin point
+  """
   def backtrack_path(orbit_map, item, path \\ []) do
     case Enum.find(orbit_map, fn {_k, v} -> Enum.any?(v, fn x -> x == item end) end) do
       nil ->
