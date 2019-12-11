@@ -86,21 +86,22 @@ defmodule Day5 do
     |> process_intcode(chunk_index + 4)
   end
 
-  defp execute_chunk({_, _, mode1}, [3, p1 | _], input, chunk_index) do
-    idx = fetch_value(mode1, p1, input)
-
+  defp execute_chunk({_, _, _}, [3, idx | _], input, chunk_index) do
     input
     |> List.replace_at(idx, get_next_input())
     |> process_intcode(chunk_index + 2)
   end
 
-  defp execute_chunk({_, _, mode1}, [4, p1 | _], input, chunk_index) do
-    idx = fetch_value(mode1, p1, input)
-
+  defp execute_chunk({_, _, _}, [4, idx | _], input, chunk_index) do
     input
     |> Enum.at(idx)
     |> handle_output
 
+    process_intcode(input, chunk_index + 2)
+  end
+
+  defp execute_chunk({_, _, _}, [cmd, _idx | _], input, chunk_index)
+       when cmd > 4 do
     process_intcode(input, chunk_index + 2)
   end
 
